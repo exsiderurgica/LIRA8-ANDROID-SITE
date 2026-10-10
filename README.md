@@ -1,16 +1,11 @@
-# LIRA•8 Android — Site
+# LIRA•8 Android — GOLD v0.20 SCREENREC
 
-Sito pubblico ufficiale di **LIRA•8 Android**, porting Android del progetto LIRA•8 in Pure Data.
+Public website for the Android port developed by Giorgio Cerrato and Filippo Belperio.
 
-## Current release
+Current stable build: `LIRA8-ANDROID-ONE-SHOT-v0.20-SCREENREC-GOLD.apk`
 
-- Status: **GOLD / STABLE**
-- Version: **v0.19 / FIX4**
-- APK: `LIRA8-ANDROID-ONE-SHOT-v0.19-EXS-LED-TTG-FEEDBACK-FIX4.apk`
-- SHA-256: `7095d8668194e11cbd010c63879235b36f426024d27e75fb1028fd532bf23f5c`
+SHA-256: `2fc289353fc86d1f27d9172e4be207763974dbc920659cd1d8516f876f10a4ae`
 
-Android port by **Giorgio Cerrato** and **Filippo Belperio**.
+Website: https://exsiderurgica.github.io/LIRA8-ANDROID-SITE/
 
-Original Pure Data project: https://github.com/MikeMorenoDSP/LIRA-8
-
-The Android port is not affiliated with SOMA Laboratory.
+Based on Mike Moreno DSP's open-source LIRA-8 Pure Data project and inspired by the SOMA Laboratory LYRA-8. Independent project; not affiliated with or endorsed by SOMA Laboratory.
