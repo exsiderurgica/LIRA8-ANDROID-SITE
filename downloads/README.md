@@ -1,9 +1,10 @@
-# APK download
+# Downloads
 
-Place the current GOLD APK in this folder using this exact filename:
+Current public stable APK expected at:
 
-`LIRA8-ANDROID-ONE-SHOT-v0.19-EXS-LED-TTG-FEEDBACK-FIX4.apk`
+`downloads/LIRA8-ANDROID-ONE-SHOT-v0.20-SCREENREC-GOLD.apk`
 
-The website download button already points to that relative path.
+SHA-256:
+`2fc289353fc86d1f27d9172e4be207763974dbc920659cd1d8516f876f10a4ae`
 
-SHA-256: `7095d8668194e11cbd010c63879235b36f426024d27e75fb1028fd532bf23f5c`
+The website download button points directly to this file.
