@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -L --fail --retry 3 -o validation.zip 'https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-5cf8-820a-805e-5435f1c399f7/raw?se=2026-10-11T00%3A05%3A46Z&sp=r&sv=2026-02-06&sr=b&scid=cc1f1fff-0fb0-51d8-a5fb-bee9ddcc2d65&skoid=b5d2651b-fef3-4bb0-a03b-ca59cc22929b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-10T01%3A46%3A32Z&ske=2026-10-11T01%3A46%3A32Z&sks=b&skv=2026-02-06&sig=TROgtnS7GyOUTfi4R8e5molmrCCYUJfigjM33o8PDxw%3D'
+          curl -L --fail --retry 3 -o validation.zip 'https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-6d0c-820a-8e29-9649b2db83ce/raw?se=2026-10-11T00%3A10%3A04Z&sp=r&sv=2026-02-06&sr=b&scid=e9b010a0-4549-567a-a64f-0b57a9bd9140&skoid=b5d2651b-fef3-4bb0-a03b-ca59cc22929b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-10T23%3A18%3A06Z&ske=2026-10-11T23%3A18%3A06Z&sks=b&skv=2026-02-06&sig=WRlHJdTGNOHkfjWd3vVUuK2TRHTeMl67mRPLgGp1djU%3D'
           rm -rf validation
           mkdir validation
           unzip -q validation.zip -d validation
@@ -34,9 +34,23 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p sig downloads
-          cat .release-signatures/manifest.b64.part* | tr -d '\n' | base64 -d > sig/MANIFEST.MF
-          cat .release-signatures/sf.b64.part* | tr -d '\n' | base64 -d > sig/TTG-RELE.SF
-          cat .release-signatures/rsa.b64.part* | tr -d '\n' | base64 -d > sig/TTG-RELE.RSA
+          python3 - <<'PY'
+          import base64, glob, hashlib, pathlib
+          specs=[
+              ('manifest','sig/MANIFEST.MF','d72bc873821d32465962d199b8f40d1f87e94a749ff5786cad9eb85db3e611a7'),
+              ('sf','sig/TTG-RELE.SF','58c8508343d3f25547b953ebd56cad18ce4a670afbbaf5150f5a835bca1776ab'),
+              ('rsa','sig/TTG-RELE.RSA','2849b51506c94c4fc8bb3f83a6cdc7d10b4b36a2bf0bffbf01834f298942f8a9'),
+          ]
+          for stem,out,expected in specs:
+              parts=sorted(glob.glob(f'.release-signatures/{stem}.b64.part*'))
+              s=''.join(pathlib.Path(p).read_text().strip() for p in parts)
+              data=base64.b64decode(s, validate=False)
+              got=hashlib.sha256(data).hexdigest()
+              print(stem, len(s), len(data), got)
+              if got != expected:
+                  raise SystemExit(f'{stem} signature payload checksum mismatch')
+              pathlib.Path(out).write_bytes(data)
+          PY
           python3 - <<'PY'
           import zipfile, os
           src='validation/LIRA8-v0.20-REBUILD-VALIDATION.apk'
