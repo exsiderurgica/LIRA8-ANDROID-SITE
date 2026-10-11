@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl -L --fail --retry 3 -o validation.zip 'https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-fa78-820a-a532-b56b2aa2c8dd/raw?se=2026-10-11T00%3A17%3A21Z&sp=r&sv=2026-02-06&sr=b&scid=85f3de84-073e-5979-9461-a8b0e84a33ca&skoid=b5d2651b-fef3-4bb0-a03b-ca59cc22929b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-10T23%3A27%3A33Z&ske=2026-10-11T23%3A27%3A33Z&sks=b&skv=2026-02-06&sig=2VS9tob4p7GTFOBEGU1j/pocwxP889Gd5OFcHEuEI5E%3D'
+          curl -L --fail --retry 3 -o validation.zip 'https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-8d4c-820a-9b10-17ec0e4bb848/raw?se=2026-10-11T00%3A18%3A36Z&sp=r&sv=2026-02-06&sr=b&scid=ab6850bf-ba3b-53ab-a53c-98392c854385&skoid=b5d2651b-fef3-4bb0-a03b-ca59cc22929b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-10T23%3A24%3A05Z&ske=2026-10-11T23%3A24%3A05Z&sks=b&skv=2026-02-06&sig=k731h4nrZ2%2Bu1VRSacfp4StiRfqiAL5aFfd7nRPO568%3D'
           rm -rf validation
           mkdir validation
           unzip -q validation.zip -d validation
@@ -37,29 +37,56 @@ jobs:
           python3 - <<'PY'
           import base64, glob, hashlib, pathlib, string
 
-          # One staging chunk lost one base64 character while being committed.
-          # Repair it deterministically against the known Git blob SHA of the exact local chunk.
-          p=pathlib.Path('.release-signatures/manifest.b64.part02')
-          s=p.read_text().strip()
-          target='6606d48ea75759b53e729d8aeed5669944ff1817'
+          alphabet=string.ascii_uppercase+string.ascii_lowercase+string.digits+'+/='
           def blob_sha(text):
               b=text.encode()
               return hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
-          if blob_sha(s) != target:
-              alphabet=string.ascii_uppercase+string.ascii_lowercase+string.digits+'+/='
+
+          def repair(path, target, expected_len):
+              p=pathlib.Path(path)
+              s=p.read_text().strip()
+              if blob_sha(s) == target:
+                  print(path, 'OK')
+                  return
               fixed=None
-              for i in range(len(s)+1):
-                  for c in alphabet:
-                      cand=s[:i]+c+s[i:]
+              if len(s) == expected_len - 1:
+                  for i in range(len(s)+1):
+                      for c in alphabet:
+                          cand=s[:i]+c+s[i:]
+                          if blob_sha(cand) == target:
+                              fixed=cand; print(path, 'repaired insertion at', i, repr(c)); break
+                      if fixed is not None: break
+              elif len(s) == expected_len:
+                  for i in range(len(s)):
+                      old=s[i]
+                      for c in alphabet:
+                          if c == old: continue
+                          cand=s[:i]+c+s[i+1:]
+                          if blob_sha(cand) == target:
+                              fixed=cand; print(path, 'repaired substitution at', i, repr(old), '->', repr(c)); break
+                      if fixed is not None: break
+              elif len(s) == expected_len + 1:
+                  for i in range(len(s)):
+                      cand=s[:i]+s[i+1:]
                       if blob_sha(cand) == target:
-                          fixed=cand
-                          print('Repaired staged manifest chunk at index', i)
-                          break
-                  if fixed is not None:
-                      break
+                          fixed=cand; print(path, 'repaired deletion at', i); break
               if fixed is None:
-                  raise SystemExit('Could not repair manifest staging chunk')
+                  raise SystemExit(f'Could not repair {path}: len={len(s)} expected={expected_len} sha={blob_sha(s)}')
               p.write_text(fixed)
+              if blob_sha(fixed) != target:
+                  raise SystemExit(f'Repair verification failed for {path}')
+
+          exact_chunks={
+              '.release-signatures/manifest.b64.part01':('4b6ed92785659951e20b1b56039a642a4b30e0b1',6000),
+              '.release-signatures/manifest.b64.part02':('6606d48ea75759b53e729d8aeed5669944ff1817',6000),
+              '.release-signatures/manifest.b64.part03':('830023766b3653d7570c4db8f6c7d0ebe0fca0ee',312),
+              '.release-signatures/sf.b64.part01':('1240f659138afa2e048319daf62f0f6791aaf87c',6000),
+              '.release-signatures/sf.b64.part02':('b0c07c314bb0dea2aef0377dc996bef862e2cdb7',6000),
+              '.release-signatures/sf.b64.part03':('7ea9745097217747a0b329eb34d5c12af3969af2',528),
+              '.release-signatures/rsa.b64.part01':('38ee87d5eadf368c93da6f7ef5952ad07d6884e9',3064),
+          }
+          for path,(sha,n) in exact_chunks.items():
+              repair(path,sha,n)
 
           specs=[
               ('manifest','sig/MANIFEST.MF','d72bc873821d32465962d199b8f40d1f87e94a749ff5786cad9eb85db3e611a7'),
@@ -119,11 +146,10 @@ jobs:
           SHA="$(cat new_sha.txt)"
           printf '%s  downloads/%s\n' "$SHA" "$APK" > SHA256.txt
           python3 - "$SHA" <<'PY'
-          import sys, pathlib, re
+          import sys, pathlib
           sha=sys.argv[1]
           p=pathlib.Path('index.html')
           s=p.read_text()
-          s=re.sub(r'(?i)(SHA-?256[^0-9a-f]*)([0-9a-f]{64})', lambda m:m.group(1)+sha, s)
           s=s.replace('2fc289353fc86d1f27d9172e4be207763974dbc920659cd1d8516f876f10a4ae',sha)
           p.write_text(s)
           PY
