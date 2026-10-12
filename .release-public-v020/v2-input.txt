@@ -1,0 +1,6 @@
+apk_sha256=0ff3125cce6c7b701160c6d79364fc8d68311ec492ec3f9dc02c56d3d50fa28f
+apk_size=4664397
+central_dir_offset=4657419
+central_dir_size=6956
+eocd_offset=4664375
+content_digest_sha256=60153996b71d73a6fca3bdbcaf81d041790cbf47484e421328f36f2fd5763617
