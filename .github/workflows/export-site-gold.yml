@@ -1,0 +1,19 @@
+name: Export current site GOLD APK
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/export-site-gold.yml'
+  workflow_dispatch:
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upload current GOLD APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-gold-apk
+          path: downloads/LIRA8-ANDROID-ONE-SHOT-v0.20-SCREENREC-GOLD.apk
+          if-no-files-found: error
+          compression-level: 0
