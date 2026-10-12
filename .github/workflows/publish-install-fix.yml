@@ -100,3 +100,5 @@ jobs:
           git add "$APK" SHA256.txt index.html downloads/README.md
           git commit -m 'Publish verified LIRA8 v0.20 install fix'
           git push origin HEAD:main
+
+# trigger: publish tested install-fix 2026-10-12
