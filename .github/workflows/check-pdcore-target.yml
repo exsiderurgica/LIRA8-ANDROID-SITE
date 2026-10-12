@@ -1,0 +1,20 @@
+name: Check pd-core target libs
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/check-pdcore-target.yml']
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compare Maven pd-core builds with target hashes
+        shell: bash
+        run: |
+          set -euxo pipefail
+          for V in 1.2.1-rc5 1.2.1-rc6; do
+            curl -L --fail -o /tmp/pd-$V.aar https://repo1.maven.org/maven2/io/github/libpd/android/pd-core/$V/pd-core-$V.aar
+            mkdir -p /tmp/$V && cd /tmp/$V && unzip -q ../pd-$V.aar
+            echo === $V ===
+            find . -type f \( -name libpd.so -o -name libpdnativeoboe.so -o -name libpique.so \) -print0 | xargs -0 sha256sum || true
+            cd /
+          done
