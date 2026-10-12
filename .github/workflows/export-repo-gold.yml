@@ -1,0 +1,15 @@
+name: Export repo GOLD APK
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/export-repo-gold.yml']
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: repo-gold-apk
+          path: downloads/LIRA8-ANDROID-ONE-SHOT-v0.20-SCREENREC-GOLD.apk
+          retention-days: 1
