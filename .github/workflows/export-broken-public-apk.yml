@@ -1,0 +1,19 @@
+name: Export current public LIRA8 APK
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/export-broken-public-apk.yml'
+  workflow_dispatch:
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upload current public APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: broken-public-apk
+          path: downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk
+          if-no-files-found: error
+          compression-level: 0
