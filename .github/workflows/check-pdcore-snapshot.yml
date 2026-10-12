@@ -1,0 +1,33 @@
+name: Check pd-core snapshots
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/check-pdcore-snapshot.yml']
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect snapshot metadata and compare target
+        shell: bash
+        run: |
+          set -euxo pipefail
+          BASE='https://central.sonatype.com/repository/maven-snapshots/io/github/libpd/android/pd-core/1.4.2-SNAPSHOT'
+          curl -L --fail "$BASE/maven-metadata.xml" -o /tmp/meta.xml
+          cat /tmp/meta.xml
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET, subprocess, pathlib, hashlib, zipfile, urllib.request
+          root=ET.parse('/tmp/meta.xml').getroot()
+          vals=[]
+          for sv in root.findall('.//snapshotVersion'):
+              if (sv.findtext('extension') or '')=='aar': vals.append(sv.findtext('value'))
+          print('AAR snapshots', vals)
+          target='65db0ffc3dd4887be5108648729648e0a304cb87f08691f8001dfd416fcb8f7e'
+          base='https://central.sonatype.com/repository/maven-snapshots/io/github/libpd/android/pd-core/1.4.2-SNAPSHOT'
+          for v in vals:
+              u=f'{base}/pd-core-{v}.aar'; p=f'/tmp/{v}.aar'
+              urllib.request.urlretrieve(u,p)
+              with zipfile.ZipFile(p) as z:
+                  n='jni/arm64-v8a/libpd.so'
+                  h=hashlib.sha256(z.read(n)).hexdigest()
+                  print(v,h,'MATCH' if h==target else '')
+          PY
