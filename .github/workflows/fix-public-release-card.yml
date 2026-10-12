@@ -1,0 +1,39 @@
+name: Fix LIRA8 public release card
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-public-release-card.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync visible release metadata with published APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHA="$(awk '{print $1}' SHA256.txt)"
+          python3 - "$SHA" <<'PY'
+          import pathlib, re, sys
+          sha=sys.argv[1]
+          p=pathlib.Path('index.html')
+          s=p.read_text()
+          s=s.replace('f71680bebee2f500c5c25fc81679d79b6fcad20a1946e2687153c9d704f4cc16', sha)
+          s=s.replace('GOLD / SCREENREC</h2>', 'GOLD / PUBLIC</h2>')
+          s=s.replace('v0.20 SCREENREC is the current GOLD baseline for public distribution.', 'v0.20 PUBLIC is the current GOLD baseline for public distribution.')
+          s=s.replace('v0.20 SCREENREC è la baseline GOLD attuale per la distribuzione pubblica.', 'v0.20 PUBLIC è la baseline GOLD attuale per la distribuzione pubblica.')
+          s=s.replace('GOLD v0.20 SCREENREC —', 'GOLD v0.20 PUBLIC —')
+          p.write_text(s)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Sync LIRA8 public release card metadata'
+          git push origin HEAD:main
