@@ -30,7 +30,7 @@ jobs:
           mkdir -p build-public
           base64 -d "$STAGE/AndroidManifest.xml.b64" > build-public/AndroidManifest.xml
           base64 -d "$STAGE/MANIFEST.MF.b64" > build-public/MANIFEST.MF
-          base64 -d "$STAGE/LIRA8-RE.SF.b64" > build-public/LIRA8-RE.SF
+          cat "$STAGE"/sf.b64.part0* | base64 -d > build-public/LIRA8-RE.SF
           base64 -d "$STAGE/LIRA8-RE.RSA.b64" > build-public/LIRA8-RE.RSA
 
           echo 'e1791597be6ae88d645ac22e158ec3c4038d68a6c0b5f77822422660f313b127  build-public/AndroidManifest.xml' | sha256sum -c -
@@ -81,7 +81,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          OLD='LIRA8-ANDROID-ONE-SHOT-v0.20-SCREENREC-GOLD.apk'
           NEW='LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk'
           SHA="$(cat build-public/new_sha.txt)"
           printf '%s  downloads/%s\n' "$SHA" "$NEW" > SHA256.txt
