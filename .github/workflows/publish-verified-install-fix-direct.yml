@@ -1,0 +1,71 @@
+name: Publish verified LIRA8 install fix direct
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-verified-install-fix-direct.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download exact APK verified on real phone
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://sdmntprdenmarkeast.oaiusercontent.com/files/00000000-9334-8210-97a6-6980274c73ee/raw?se=2026-10-12T21%3A27%3A43Z&sp=r&sv=2026-02-06&sr=b&scid=86ca1bd7-2a19-5b74-9f06-413a9fe05874&skoid=b5d2651b-fef3-4bb0-a03b-ca59cc22929b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-12T05%3A24%3A20Z&ske=2026-10-13T05%3A24%3A20Z&sks=b&skv=2026-02-06&sig=Vz/9wB4esS9gsc3LJ4TmbX4RvG%2BGKTcbBa%2BTM4QRaQM%3D'
+          curl -L --fail --retry 3 -o /tmp/LIRA8-v0.20-INSTALL-FIX.apk "$URL"
+          echo '813cd4325c99f845e294686b1fd93782af48ce87790b9966b52a576897f37d59  /tmp/LIRA8-v0.20-INSTALL-FIX.apk' | sha256sum -c -
+
+      - name: Verify Android package integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='/tmp/LIRA8-v0.20-INSTALL-FIX.apk'
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/apksigner.txt
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/apksigner.txt
+          "$ZIPALIGN" -c -v 4 "$APK"
+
+      - name: Publish exact verified APK and update site
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk'
+          cp /tmp/LIRA8-v0.20-INSTALL-FIX.apk "$DEST"
+          SHA='813cd4325c99f845e294686b1fd93782af48ce87790b9966b52a576897f37d59'
+          printf '%s  %s\n' "$SHA" "$DEST" > SHA256.txt
+
+          python3 - "$SHA" <<'PY'
+          from pathlib import Path
+          import re,sys
+          sha=sys.argv[1]
+          p=Path('index.html')
+          s=p.read_text()
+          s=re.sub(r"const APK_URL='[^']+';", "const APK_URL='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk';", s)
+          s=re.sub(r"const APK_NAME='[^']+';", "const APK_NAME='LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk';", s)
+          s=re.sub(r'(?i)(SHA-256[^0-9a-fA-F]*)([0-9a-fA-F]{64})', lambda m:m.group(1)+sha, s)
+          s=s.replace('0.20-public-v2','0.20-install-fix')
+          s=s.replace('v0.20 PUBLIC V2','v0.20 PUBLIC / INSTALL FIX')
+          s=s.replace('GOLD / STABLE','GOLD / PUBLIC')
+          p.write_text(s)
+          Path('downloads/README.md').write_text(
+              '# Downloads\n\nCurrent verified public APK:\n\n'
+              '`downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk`\n\n'
+              f'SHA-256:\n`{sha}`\n\n'
+              'Exact INSTALL FIX build verified by a real on-device installation test.\n'
+              'APK Signature Scheme v2 verified; ZIP alignment verified.\n'
+          )
+          PY
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$DEST" SHA256.txt index.html downloads/README.md
+          git commit -m 'Publish verified LIRA8 v0.20 install fix'
+          git push origin HEAD:main
