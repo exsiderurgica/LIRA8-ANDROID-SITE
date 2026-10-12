@@ -1,0 +1,68 @@
+name: Prepare LIRA8 v2 signing input
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/prepare-v2-input.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute exact APK Signature Scheme v2 content digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct, hashlib
+
+          p=Path('downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk')
+          b=p.read_bytes()
+          sig=b'PK\x05\x06'
+          start=max(0,len(b)-65557)
+          e=b.rfind(sig,start)
+          if e<0 or e+22>len(b): raise SystemExit('EOCD not found')
+          comment_len=struct.unpack_from('<H',b,e+20)[0]
+          if e+22+comment_len != len(b): raise SystemExit('EOCD/comment mismatch')
+          disk_no, cd_disk, disk_entries, total_entries = struct.unpack_from('<HHHH',b,e+4)
+          cd_size, cd_off=struct.unpack_from('<II',b,e+12)
+          if disk_no or cd_disk or disk_entries != total_entries: raise SystemExit('multi-disk APK unsupported')
+          if cd_off+cd_size != e: raise SystemExit('unexpected central directory layout')
+          if cd_off >= 24 and b[cd_off-16:cd_off] == b'APK Sig Block 42': raise SystemExit('APK already has signing block')
+
+          def u32(n): return struct.pack('<I',n)
+          chunks=[]
+          eocd=bytearray(b[e:])
+          struct.pack_into('<I',eocd,16,cd_off)
+          for section in (b[:cd_off], b[cd_off:e], bytes(eocd)):
+              for i in range(0,len(section),1024*1024):
+                  c=section[i:i+1024*1024]
+                  chunks.append(hashlib.sha256(b'\xA5'+u32(len(c))+c).digest())
+          digest=hashlib.sha256(b'\x5A'+u32(len(chunks))+b''.join(chunks)).hexdigest()
+          out=Path('.release-public-v020/v2-input.txt')
+          out.write_text(
+              f'apk_sha256={hashlib.sha256(b).hexdigest()}\n'
+              f'apk_size={len(b)}\n'
+              f'central_dir_offset={cd_off}\n'
+              f'central_dir_size={cd_size}\n'
+              f'eocd_offset={e}\n'
+              f'content_digest_sha256={digest}\n'
+          )
+          print(out.read_text())
+          PY
+      - name: Commit v2 signing input
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .release-public-v020/v2-input.txt
+          git commit -m 'Prepare exact LIRA8 v2 signing input'
+          git push origin HEAD:main
