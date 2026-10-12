@@ -1,12 +1,11 @@
 # Downloads
 
-Current public stable APK:
+Current verified public APK:
 
 `downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk`
 
 SHA-256:
-`0e87847a5587432551661d9172b935f80266663172eb7b71fa8921194261f799`
+`813cd4325c99f845e294686b1fd93782af48ce87790b9966b52a576897f37d59`
 
-Android 9+ (API 28), universal APK: armeabi-v7a, arm64-v8a, x86, x86_64.
-Package: `com.exsiderurgica.lira8`; non-debuggable release manifest.
-Verified APK Signature Scheme v2 plus v1 compatibility signature.
+Exact INSTALL FIX build verified by a real on-device installation test.
+APK Signature Scheme v2 verified; ZIP alignment verified.
