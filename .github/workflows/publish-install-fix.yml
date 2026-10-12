@@ -1,128 +1,42 @@
-name: Publish LIRA8 public install fix
+name: Verify LIRA8 published install fix
 
 on:
   push:
     branches: [main]
     paths:
       - '.github/workflows/publish-install-fix.yml'
-      - '.release-public-v020/install-fix-v2-signing-block.b64'
 
 permissions:
   contents: write
 
 jobs:
-  publish:
+  verify-and-fix-metadata:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Rebuild aligned public APK with valid v2 signature
+      - name: Verify exact on-device-tested APK and fix displayed checksum
         shell: bash
         run: |
           set -euo pipefail
           APK='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk'
-          BLOCK='.release-public-v020/install-fix-v2-signing-block.b64'
-          INPUT_SHA='0e87847a5587432551661d9172b935f80266663172eb7b71fa8921194261f799'
-          UNSIGNED_SHA='0ff3125cce6c7b701160c6d79364fc8d68311ec492ec3f9dc02c56d3d50fa28f'
-          ALIGNED_SHA='1bf10f319d539775d3ed6238e5f51970dc88a53b3ff9b0c6163b3b8b4f6056b5'
-          FINAL_SHA='851771e56d614d2593f11f37105d3be6567e19edc795f8be5e90d502177bb797'
-
-          ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
-          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          test -x "$ZIPALIGN"
-          test -x "$APKSIGNER"
-          echo "$INPUT_SHA  $APK" | sha256sum -c -
-
+          SHA='813cd4325c99f845e294686b1fd93782af48ce87790b9966b52a576897f37d59'
+          echo "$SHA  $APK" | sha256sum -c -
           python3 - <<'PY'
           from pathlib import Path
-          import struct
-          src=Path('downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk')
-          out=Path('/tmp/public-unsigned.apk')
-          data=src.read_bytes()
-          eocd=data.rfind(b'PK\x05\x06', max(0, len(data)-65557))
-          if eocd < 0:
-              raise SystemExit('EOCD not found')
-          cd_off=struct.unpack_from('<I', data, eocd+16)[0]
-          if data[cd_off-16:cd_off] != b'APK Sig Block 42':
-              raise SystemExit('APK signing block not found before central directory')
-          size=struct.unpack_from('<Q', data, cd_off-24)[0]
-          block_start=cd_off-(size+8)
-          if struct.unpack_from('<Q', data, block_start)[0] != size:
-              raise SystemExit('APK signing block size mismatch')
-          block_len=cd_off-block_start
-          result=bytearray(data[:block_start] + data[cd_off:])
-          new_eocd=eocd-block_len
-          struct.pack_into('<I', result, new_eocd+16, block_start)
-          out.write_bytes(result)
-          PY
-
-          echo "$UNSIGNED_SHA  /tmp/public-unsigned.apk" | sha256sum -c -
-          "$ZIPALIGN" -f -p 4 /tmp/public-unsigned.apk /tmp/public-aligned.apk
-          echo "$ALIGNED_SHA  /tmp/public-aligned.apk" | sha256sum -c -
-          base64 -d "$BLOCK" > /tmp/v2block.bin
-
-          python3 - <<'PY'
-          from pathlib import Path
-          import struct
-          src=Path('/tmp/public-aligned.apk')
-          out=Path('/tmp/LIRA8-ANDROID-v0.20-PUBLIC-INSTALL-FIX.apk')
-          data=src.read_bytes()
-          block=Path('/tmp/v2block.bin').read_bytes()
-          if b'APK Sig Block 42' in data:
-              raise SystemExit('Aligned source unexpectedly already contains a signing block')
-          eocd=data.rfind(b'PK\x05\x06', max(0, len(data)-65557))
-          if eocd < 0:
-              raise SystemExit('EOCD not found')
-          comment_len=struct.unpack_from('<H', data, eocd+20)[0]
-          if eocd+22+comment_len != len(data):
-              raise SystemExit('EOCD is not final record')
-          cd_size=struct.unpack_from('<I', data, eocd+12)[0]
-          cd_off=struct.unpack_from('<I', data, eocd+16)[0]
-          if cd_off+cd_size != eocd:
-              raise SystemExit('Central directory layout mismatch')
-          result=bytearray(data[:cd_off] + block + data[cd_off:])
-          new_eocd=eocd+len(block)
-          struct.pack_into('<I', result, new_eocd+16, cd_off+len(block))
-          out.write_bytes(result)
-          PY
-
-          echo "$FINAL_SHA  /tmp/LIRA8-ANDROID-v0.20-PUBLIC-INSTALL-FIX.apk" | sha256sum -c -
-          "$APKSIGNER" verify --verbose --print-certs /tmp/LIRA8-ANDROID-v0.20-PUBLIC-INSTALL-FIX.apk | tee /tmp/apksigner.txt
-          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/apksigner.txt
-          "$ZIPALIGN" -c -v 4 /tmp/LIRA8-ANDROID-v0.20-PUBLIC-INSTALL-FIX.apk
-
-      - name: Publish APK and update site metadata
-        shell: bash
-        run: |
-          set -euo pipefail
-          APK='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk'
-          cp /tmp/LIRA8-ANDROID-v0.20-PUBLIC-INSTALL-FIX.apk "$APK"
-          SHA="$(sha256sum "$APK" | awk '{print $1}')"
-          printf '%s  %s\n' "$SHA" "$APK" > SHA256.txt
-
-          python3 - "$SHA" <<'PY'
-          from pathlib import Path
-          import re,sys
-          sha=sys.argv[1]
+          old='0ff3125cce6c7b701160c6d79364fc8d68311ec492ec3f9dc02c56d3d50fa28f'
+          new='813cd4325c99f845e294686b1fd93782af48ce87790b9966b52a576897f37d59'
           p=Path('index.html')
           s=p.read_text()
-          s=re.sub(r"const APK_URL='[^']+';", "const APK_URL='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk';", s)
-          s=re.sub(r"const APK_NAME='[^']+';", "const APK_NAME='LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk';", s)
-          s=re.sub(r'(?i)(SHA-256[^0-9a-fA-F]*)([0-9a-fA-F]{64})', lambda m:m.group(1)+sha, s)
-          s=s.replace('0.20-public-v2','0.20-public-install-fix')
-          s=s.replace('v0.20 PUBLIC V2','v0.20 PUBLIC / INSTALL FIX')
+          s=s.replace(old,new)
           p.write_text(s)
-          Path('downloads/README.md').write_text(
-              '# Downloads\n\nCurrent public APK:\n\n'
-              '`downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk`\n\n'
-              f'SHA-256:\n`{sha}`\n\n'
-              'Android 9+ / API 28. Package: `com.exsiderurgica.lira8`.\n'
-              'APK Signature Scheme v2 verified; ZIP alignment verified.\n'
-          )
           PY
-
+          printf '%s  %s\n' "$SHA" "$APK" > SHA256.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$APK" SHA256.txt index.html downloads/README.md
-          git commit -m 'Publish LIRA8 v0.20 public install fix'
-          git push origin HEAD:main
+          git add index.html SHA256.txt
+          if git diff --cached --quiet; then
+            echo 'Metadata already correct.'
+          else
+            git commit -m 'Fix displayed LIRA8 install-fix checksum'
+            git push origin HEAD:main
+          fi
