@@ -1,0 +1,36 @@
+name: Split prepared LIRA8 SF payload
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/split-site-sf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Split exact SF bytes to base64 chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, pathlib, hashlib
+          sf=pathlib.Path('.release-public-v020/site-LIRA8-RE.SF').read_bytes()
+          assert hashlib.sha256(sf).hexdigest() == pathlib.Path('.release-public-v020/site-SF.sha256').read_text().strip()
+          s=base64.b64encode(sf).decode()
+          chunk=3132
+          for i in range(0,len(s),chunk):
+              pathlib.Path(f'.release-public-v020/site-sf.b64.part{i//chunk+1:02d}').write_text(s[i:i+chunk])
+          pathlib.Path('.release-public-v020/site-sf-b64-length.txt').write_text(str(len(s))+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .release-public-v020/site-sf.b64.part* .release-public-v020/site-sf-b64-length.txt
+          git commit -m 'Stage exact LIRA8 SF base64 chunks'
+          git push origin HEAD:main
