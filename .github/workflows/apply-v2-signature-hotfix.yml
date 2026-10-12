@@ -1,0 +1,106 @@
+name: Apply LIRA8 APK v2 signature hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-v2-signature-hotfix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Insert verified APK Signature Scheme v2 block
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk'
+          BLOCK64='.release-public-v020/public-v2-signing-block.b64'
+          BASE_SHA='0ff3125cce6c7b701160c6d79364fc8d68311ec492ec3f9dc02c56d3d50fa28f'
+          FINAL_SHA='0e87847a5587432551661d9172b935f80266663172eb7b71fa8921194261f799'
+          echo "$BASE_SHA  $APK" | sha256sum -c -
+          base64 -d "$BLOCK64" > /tmp/apk-v2-block.bin
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          apk=Path('downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk')
+          data=apk.read_bytes()
+          block=Path('/tmp/apk-v2-block.bin').read_bytes()
+          if b'APK Sig Block 42' in data:
+              raise SystemExit('APK already has a signing block; refusing to double-insert')
+          eocd=data.rfind(b'PK\x05\x06', max(0,len(data)-65557))
+          if eocd < 0:
+              raise SystemExit('EOCD not found')
+          comment_len=struct.unpack_from('<H',data,eocd+20)[0]
+          if eocd+22+comment_len != len(data):
+              raise SystemExit('EOCD is not the final record')
+          cd_size=struct.unpack_from('<I',data,eocd+12)[0]
+          cd_off=struct.unpack_from('<I',data,eocd+16)[0]
+          if cd_off+cd_size != eocd:
+              raise SystemExit('Central directory layout mismatch')
+          out=bytearray(data[:cd_off]+block+data[cd_off:])
+          new_eocd=eocd+len(block)
+          struct.pack_into('<I',out,new_eocd+16,cd_off+len(block))
+          apk.write_bytes(out)
+          PY
+
+          echo "$FINAL_SHA  $APK" | sha256sum -c -
+
+      - name: Verify Android v2 signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk'
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          test -x "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/verify.txt
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/verify.txt
+
+      - name: Update website checksum and release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk'
+          SHA="$(sha256sum "$APK" | awk '{print $1}')"
+          printf '%s  %s\n' "$SHA" "$APK" > SHA256.txt
+          python3 - "$SHA" <<'PY'
+          from pathlib import Path
+          import re,sys
+          sha=sys.argv[1]
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace('LIRA8-ANDROID-ONE-SHOT-v0.20-SCREENREC-GOLD.apk','LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk')
+          s=s.replace('GOLD / STABLE','GOLD / PUBLIC')
+          s=s.replace('0.20-screenrec-stable','0.20-public-v2')
+          s=s.replace('v0.20 SCREENREC','v0.20 PUBLIC V2')
+          s=re.sub(r'(?i)(SHA-256[^0-9a-fA-F]*)([0-9a-fA-F]{64})', lambda m:m.group(1)+sha, s)
+          s=re.sub(r"const APK_URL='[^']+';", "const APK_URL='downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk';", s)
+          s=re.sub(r"const APK_NAME='[^']+';", "const APK_NAME='LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk';", s)
+          p.write_text(s)
+          Path('downloads/README.md').write_text(
+              '# Downloads\n\nCurrent public stable APK:\n\n'
+              '`downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk`\n\n'
+              'SHA-256:\n`'+sha+'`\n\n'
+              'Android 9+ (API 28), universal APK: armeabi-v7a, arm64-v8a, x86, x86_64.\n'
+              'Package: `com.exsiderurgica.lira8`; non-debuggable release manifest.\n'
+              'Verified APK Signature Scheme v2 plus v1 compatibility signature.\n'
+          )
+          PY
+
+      - name: Publish hotfixed APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk downloads/README.md SHA256.txt index.html
+          git commit -m 'Fix LIRA8 Android 11+ install with APK Signature Scheme v2'
+          git push origin HEAD:main
