@@ -1,0 +1,123 @@
+name: Prepare LIRA8 public signature payload
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/prepare-public-signature.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct live APK manifest digests and prepare new SF
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, glob, hashlib, pathlib, string, re
+
+          alphabet=string.ascii_uppercase+string.ascii_lowercase+string.digits+'+/='
+          def blob_sha(text):
+              b=text.encode()
+              return hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+          def repair(path,target,expected_len):
+              p=pathlib.Path(path); s=p.read_text().strip()
+              if blob_sha(s)==target: return s
+              fixed=None
+              if len(s)==expected_len-1:
+                  for i in range(len(s)+1):
+                      for c in alphabet:
+                          cand=s[:i]+c+s[i:]
+                          if blob_sha(cand)==target: fixed=cand; break
+                      if fixed is not None: break
+              elif len(s)==expected_len:
+                  for i in range(len(s)):
+                      old=s[i]
+                      for c in alphabet:
+                          if c==old: continue
+                          cand=s[:i]+c+s[i+1:]
+                          if blob_sha(cand)==target: fixed=cand; break
+                      if fixed is not None: break
+              elif len(s)==expected_len+1:
+                  for i in range(len(s)):
+                      cand=s[:i]+s[i+1:]
+                      if blob_sha(cand)==target: fixed=cand; break
+              if fixed is None: raise SystemExit(f'cannot repair {path}')
+              return fixed
+
+          specs=[
+            ('.release-signatures/manifest.b64.part01','4b6ed92785659951e20b1b56039a642a4b30e0b1',6000),
+            ('.release-signatures/manifest.b64.part02','6606d48ea75759b53e729d8aeed5669944ff1817',6000),
+            ('.release-signatures/manifest.b64.part03','830023766b3653d7570c4db8f6c7d0ebe0fca0ee',312),
+          ]
+          raw=''.join(repair(*x) for x in specs)
+          old=base64.b64decode(raw,validate=True)
+
+          new_axml=base64.b64decode(pathlib.Path('.release-public-v020/AndroidManifest.xml.b64').read_text().strip(),validate=True)
+          new_digest=base64.b64encode(hashlib.sha256(new_axml).digest()).decode()
+
+          # Preserve exact live manifest ordering/CRLF and replace only AndroidManifest.xml digest.
+          sections=old.split(b'\r\n\r\n')
+          changed=False
+          out=[]
+          for sec in sections:
+              if sec.startswith(b'Name: AndroidManifest.xml\r\n'):
+                  text=sec.decode('utf-8')
+                  text=re.sub(r'SHA-256-Digest: [A-Za-z0-9+/=]+', 'SHA-256-Digest: '+new_digest, text, count=1)
+                  sec=text.encode('utf-8'); changed=True
+              out.append(sec)
+          if not changed: raise SystemExit('AndroidManifest.xml section not found')
+          mf=b'\r\n\r\n'.join(out)
+
+          def b64sha(data): return base64.b64encode(hashlib.sha256(data).digest()).decode()
+          def wrap(line):
+              b=line.encode('utf-8'); lines=[]
+              while len(b)>72:
+                  lines.append(b[:72]); b=b' '+b[72:]
+              lines.append(b)
+              return b'\r\n'.join(lines)+b'\r\n'
+
+          mparts=mf.split(b'\r\n\r\n')
+          main=mparts[0]+b'\r\n\r\n'
+          sf=b''
+          sf+=wrap('Signature-Version: 1.0')
+          sf+=wrap('Created-By: 21.0.12.1 (Debian)')
+          sf+=wrap('SHA-256-Digest-Manifest: '+b64sha(mf))
+          sf+=wrap('SHA-256-Digest-Manifest-Main-Attributes: '+b64sha(main))
+          sf+=b'\r\n'
+          for p in mparts[1:]:
+              if not p: continue
+              sec=p+b'\r\n\r\n'
+              lines=sec.split(b'\r\n')
+              if not lines[0].startswith(b'Name: '): raise SystemExit('bad section')
+              name=lines[0][6:]; i=1
+              while i<len(lines) and lines[i].startswith(b' '):
+                  name+=lines[i][1:]; i+=1
+              sf+=wrap('Name: '+name.decode('utf-8'))
+              sf+=wrap('SHA-256-Digest: '+b64sha(sec))
+              sf+=b'\r\n'
+
+          pathlib.Path('.release-public-v020/site-MANIFEST.MF').write_bytes(mf)
+          pathlib.Path('.release-public-v020/site-LIRA8-RE.SF').write_bytes(sf)
+          pathlib.Path('.release-public-v020/site-SF.sha256').write_text(hashlib.sha256(sf).hexdigest()+'\n')
+          print('old manifest',len(old),hashlib.sha256(old).hexdigest())
+          print('new manifest',len(mf),hashlib.sha256(mf).hexdigest())
+          print('new sf',len(sf),hashlib.sha256(sf).hexdigest())
+          PY
+
+      - name: Commit prepared public signature inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .release-public-v020/site-MANIFEST.MF .release-public-v020/site-LIRA8-RE.SF .release-public-v020/site-SF.sha256
+          git commit -m 'Prepare LIRA8 public signature inputs for live APK'
+          git push origin HEAD:main
