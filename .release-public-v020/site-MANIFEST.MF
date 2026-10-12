@@ -1,0 +1,282 @@
+Manifest-Version: 1.0
+Created-By: 21.0.12.1 (Debian)
+
+Name: lib/armeabi-v7a/liblrshift_tilde.so
+SHA-256-Digest: eIpNrkwqXO6C4pm9NBSKmopxSj0gG1BGZmOqpzkvn8M=
+
+Name: lib/armeabi-v7a/libfiddle_tilde.so
+SHA-256-Digest: FFRT76w1nNONt4zdH+MzIsOhDK3RsKkIGJ8hYumT+DA=
+
+Name: lib/x86_64/libpd_tilde.so
+SHA-256-Digest: Vb2CepHkM4RKhGh4QKSLhvp9C6Lc3fv4kGyjJzSyOmk=
+
+Name: lib/arm64-v8a/liblrshift_tilde.so
+SHA-256-Digest: tMkLlSYDkRpJLpbi6K45dfxncdzp5oicLexHdylDnog=
+
+Name: assets/lira8/abs/gui.link/gui.link.pd
+SHA-256-Digest: zmwELn0Y6QYLsDnCXzXNOcQ9AdTn9grrpuRHouFkI1U=
+
+Name: lib/armeabi-v7a/libbonk_tilde.so
+SHA-256-Digest: /60RPfbirwZQBjMJuNt/NUXH0ZIBxmf83Yo4vQWpxQo=
+
+Name: lib/armeabi-v7a/libstdout.so
+SHA-256-Digest: akYmr+vBV05zFxfDh0Z+2MeF353EG26IQinMb3XCYno=
+
+Name: lib/x86/libpdnative.so
+SHA-256-Digest: 0DUIURu3e7rspWOfB1a9dF3Mn7+6pCsShnJOhq/i7Z4=
+
+Name: lib/x86/libpique.so
+SHA-256-Digest: 6RQcvtNl7sY0VtSlvOjHoSvRphLxkp+ct/mLrT2pUxo=
+
+Name: lib/x86/libc++_shared.so
+SHA-256-Digest: G5+6QoLFoEOZSqAjwKJ0tYBTTF1ykWyue0K+xOGifXA=
+
+Name: res/raw/silence.wav
+SHA-256-Digest: 0yMXQ7fkCu+kqBYeVsTu8VpOlo+lCIoRQrjWcjlXF0A=
+
+Name: assets/lira8/abs/prm.source.pd
+SHA-256-Digest: KlQ2OqCCIclRLWCl+NVgGg/UDV2JvBsOXD47Usn+i/o=
+
+Name: lib/x86_64/libstdout.so
+SHA-256-Digest: iN3j8aY9mQccSaTM8riPKzKrIOBGdY1DyCr6mua9Cxk=
+
+Name: assets/lira8/abs/prm.tune.pd
+SHA-256-Digest: 9CqFe6ZIzKOnvUlq/Qmuvn1mOuD7droMcYBxhJicvJY=
+
+Name: lib/armeabi-v7a/libloop_tilde.so
+SHA-256-Digest: caqHuU/NaSPpcH8PlHt6Uo3ok6GiT8Z+aoqCIgQKWk4=
+
+Name: classes4.dex
+SHA-256-Digest: 64fk0FrANGuJ2hTfuGu6ZYK42peMsW1uem+OjPRYww8=
+
+Name: lib/arm64-v8a/libpdnativeoboe.so
+SHA-256-Digest: 2BC7LEBsd+l02iuPrv5+yhVIlWAbPuM5fEMGHmpJPXs=
+
+Name: lib/x86/libpd_tilde.so
+SHA-256-Digest: aBUiMalhf/ZcT4fa4qDkllcTAV2e56rYu6CUzxiJPHA=
+
+Name: lib/x86_64/liblrshift_tilde.so
+SHA-256-Digest: kavn/8DCA2v88wBKV6z50lKEEyNI7lz0a5bcr1csxBI=
+
+Name: lib/x86_64/libpique.so
+SHA-256-Digest: hu+XE5+fCU4zUTT5IL5B0Wjwh9OQgn15/zF8zBw9U/o=
+
+Name: lib/arm64-v8a/libpique.so
+SHA-256-Digest: oxGdcfh9DiFMe7tGEdTxMFziBS2b7HN/I3zxI020qmQ=
+
+Name: lib/x86_64/libbonk_tilde.so
+SHA-256-Digest: lJwBkhhbI9UgPzBbqEXiYd+OfQ6OI+NQDjoCuvK4aRE=
+
+Name: lib/arm64-v8a/libpdnativeopensl.so
+SHA-256-Digest: v0qE4dDlcZkLmUTpRJ6w9JL+ZoTwcX2yuScAqWDHCfI=
+
+Name: lib/x86_64/libpd.so
+SHA-256-Digest: 8cBxDDTox9I1FjxrWpddYQBYvWzy0zhOxd4iacDHDR4=
+
+Name: lib/x86_64/libfiddle_tilde.so
+SHA-256-Digest: iqu8pvre/L1aEwzScF2tDsvOEqdJavM9a8OVrDCkX4A=
+
+Name: assets/lira8/abs/exs.recorder~.pd
+SHA-256-Digest: gWjc6wl4S20RxeyKK27BwDkHWuUvnDMqEVyMB1pAo8Q=
+
+Name: classes2.dex
+SHA-256-Digest: afOlA0s1juUe5xAdb/FqViWKJP6M1gpmHquysa36e+I=
+
+Name: res/drawable/icon.png
+SHA-256-Digest: xCTuzDhrIzg7WvS5XvJ8klBzh4n3RWokF1zUmEsOjeI=
+
+Name: lib/armeabi-v7a/libpique.so
+SHA-256-Digest: TrlJEKhUWQt7iDkr16iqvLa/tz1jMA1mCn0qatJH8NI=
+
+Name: lib/armeabi-v7a/libsigmund_tilde.so
+SHA-256-Digest: FhwV92lfvFw1WN2qND2ZheNZhZs2p2rwGEMYGvwkOJ8=
+
+Name: lib/x86/libfiddle_tilde.so
+SHA-256-Digest: KFFaLZ+EXQ0Ic15nQ8J9uuSSoT9/F9+N9kpH+m1mq78=
+
+Name: lib/armeabi-v7a/libpd_tilde.so
+SHA-256-Digest: txRAFExGZZXuHwXBnfqf2wRNME3PY3tSQu+9kE2VoXQ=
+
+Name: lib/arm64-v8a/libpd.so
+SHA-256-Digest: N4q2RYXVwU0jLmXkSGeqxcHjmwN1jPXgrN4/SIyGRFs=
+
+Name: classes3.dex
+SHA-256-Digest: HX3y15/4WOrvO/LUpGSZDwGwqiMMFuQDR5zwKlvn13U=
+
+Name: res/drawable/exs_logo.png
+SHA-256-Digest: vtHxgIAUo5lk7WrmhGmowAueNaCpL0p7kspo46DE6Q4=
+
+Name: assets/lira8/abs/expander~.pd
+SHA-256-Digest: zdjZtIUngFlgI606n8b3wxRAMObkBH5Y62AY2XI1hD0=
+
+Name: lib/arm64-v8a/libloop_tilde.so
+SHA-256-Digest: O1JuaWY9liTaVRse9Wc+SY4Dz4TI0yUdDYn2dTr7Nd8=
+
+Name: lib/x86_64/libpdnativeopensl.so
+SHA-256-Digest: +dH085UP20PA+omr1XD34PSdc1HY1+l61ozJMOW0Hlk=
+
+Name: lib/x86/libpd.so
+SHA-256-Digest: 2LM9QUj2JYqm08QLMyJ8lexUVWH+Rdtgrmse7qRQQH4=
+
+Name: lib/x86/libbonk_tilde.so
+SHA-256-Digest: 7M9dT0nnGAWkO5CLIYz/h9vXKQE/c3LtdeFWpx+wrS0=
+
+Name: assets/lira8/abs/gui.link/gui.link-help.pd
+SHA-256-Digest: rNZ1YUsld/8qnbXXft+TOqW5plGhJ6gr8pDb1SGaItQ=
+
+Name: assets/lira8/abs/notemap.pd
+SHA-256-Digest: cW3WNw/jUIhCjun81qkaMYzBLTSl7M5aNLpQgJvK+As=
+
+Name: lib/armeabi-v7a/libchoice.so
+SHA-256-Digest: CkrzfhiS83jgnGlO3wMJv9U7ogPet3NL/yFgnHR1ueM=
+
+Name: res/mipmap-anydpi/ic_launcher.xml
+SHA-256-Digest: yF1fMNCLVssBE/joBFMjFfc8AOp6rCcT7PMo/EjdU+Q=
+
+Name: assets/lira8/abs/prm.pitch.pd
+SHA-256-Digest: yVG4yebmtgD7RLOrKO6IUVBaIFb08l1/V85jnARUdwo=
+
+Name: assets/lira8/abs/compressor~.pd
+SHA-256-Digest: 2hxh53CPOYUqwGLM0su4AS94zu+V6MiDbHRjzBNfmDw=
+
+Name: lib/x86/libstdout.so
+SHA-256-Digest: DL2GN13LmY7jTWeGBKdN+lPXBn98rOef49XnXiHNeBY=
+
+Name: res/raw/extra_abs.zip
+SHA-256-Digest: pixIKofohsl0lcFooPKpJWKGkF/3o6bzZMIHqZdtGxY=
+
+Name: lib/x86_64/libpdnative.so
+SHA-256-Digest: KUZwf/2Vrhlpz1Kv7GOtdK9HxSM1PWpY0YtkW4Yb2t8=
+
+Name: resources.arsc
+SHA-256-Digest: BO34N5sL/oZmZxkouJVYdS1Vn5GSO4wROPQIYBiHTLc=
+
+Name: lib/x86/liblrshift_tilde.so
+SHA-256-Digest: kNKG/QLH1rhIKOcWCdd+Ut0hB0vBRpWnplP/nWY5oLM=
+
+Name: assets/lira8/abs/ma.tanh~.pd
+SHA-256-Digest: xOsHKHbnHnE8+pTHN2ZnGfZCfq1xvI53gZ1qp/3wICM=
+
+Name: lib/armeabi-v7a/libpd.so
+SHA-256-Digest: bhdVCAf8c+8VQxSGuQwgx6jm7Pg0NWNDPV0N1nnyZBg=
+
+Name: lib/arm64-v8a/libstdout.so
+SHA-256-Digest: YaFYV7ksD4wlTZ+3nmql1BcZT7hUTeF31Q75NlyuS6k=
+
+Name: AndroidManifest.xml
+SHA-256-Digest: 4XkVl75q6I1kWsIuFY7DxAONaKbAtfd4IkImYPMTsSc=
+
+Name: assets/lira8/abs/key.tgl.pd
+SHA-256-Digest: B/Y/qhC2f2pil3RFs3258DGeBM7OcUQVnwx2opWDOts=
+
+Name: lib/arm64-v8a/libc++_shared.so
+SHA-256-Digest: xML+XLyx+6AAOjH8erKam7Et9swYfsRagGRiVA6D2Ts=
+
+Name: lib/arm64-v8a/libpd_tilde.so
+SHA-256-Digest: NQdcdL6S5GIa/w6onalcVQ4bIAoJz+EcMlwPxqYD0Tg=
+
+Name: lib/arm64-v8a/libbob_tilde.so
+SHA-256-Digest: OkVwcXuCNYRzOj75JgUH5jxUe6eNRk3vIi182NERqxc=
+
+Name: lib/x86_64/libc++_shared.so
+SHA-256-Digest: aDocfNL2gp/UC/gFc5FmxfzjUjW/YNLE5Klen2WjQu8=
+
+Name: lib/arm64-v8a/liboboe.so
+SHA-256-Digest: JpYXmp4wL0BHzgQUbeOfZJML36p11R2mO8evGiKLjXM=
+
+Name: lib/armeabi-v7a/libpdnativeoboe.so
+SHA-256-Digest: 0XHLdGf09YoeDfiufYo6+nb8oSrNWhD5aCs5UGKAh2w=
+
+Name: res/xml/preferences.xml
+SHA-256-Digest: mVHrMzqufxKnv2ksJeIIk6Hcagw18S1od68aT+7vdcA=
+
+Name: lib/arm64-v8a/libfiddle_tilde.so
+SHA-256-Digest: bdJ++qEUALspU80OenJJSlgV+Ew9DryFg2Laky2KJA8=
+
+Name: lib/x86_64/libchoice.so
+SHA-256-Digest: OhOOr9ZZYZnTjprjk1+cMoUbC+ln2goq22V5bnXxccY=
+
+Name: lib/x86/liboboe.so
+SHA-256-Digest: iEa9xzoa2ITgF8fzCCBCGEu4yYdmUfSOd/rvJPfH7sQ=
+
+Name: lib/x86_64/libsigmund_tilde.so
+SHA-256-Digest: 0y/3LoUz55Eys8tm+7sFeAOozF1UoW1j0q+bn3J/oII=
+
+Name: lib/arm64-v8a/libpdnative.so
+SHA-256-Digest: nNgqtL7KIEcXp3BSprBn7QNKF7PWjcJ56vQHfVQve+w=
+
+Name: res/drawable/ic_launcher.xml
+SHA-256-Digest: gl/PXFaNQB7qj4XwJpgI+i0n6BWTre3nw4BItZOL7MM=
+
+Name: assets/lira8/abs/os.triangle~.pd
+SHA-256-Digest: Mge3uSDc+sG2Wl6mNOp/pavJp9qSHD2+ZWMqWcnKIG4=
+
+Name: lib/x86/libbob_tilde.so
+SHA-256-Digest: n4WMAkxjfKuCM9oEL6dCI8ouixXgf7oU7noYpOnFBqE=
+
+Name: lib/x86_64/liboboe.so
+SHA-256-Digest: 8RaIGdh7hXG7fIFHF2hUouV4O65uNdKkINmdwZaS25Q=
+
+Name: lib/arm64-v8a/libbonk_tilde.so
+SHA-256-Digest: 786dSw1tshaOK8LP0CoUNIlO9hi2TAx61a9V3+4OzgU=
+
+Name: lib/arm64-v8a/libsigmund_tilde.so
+SHA-256-Digest: 7IMWQsjGpHxUkpt6lK/Nh7g3b1w71jeMrgtW1I4S13U=
+
+Name: lib/armeabi-v7a/libc++_shared.so
+SHA-256-Digest: rzg2VNr0zwgpYVRgQZoYD4Tt2di/UaoPge0NuBG/hJE=
+
+Name: lib/arm64-v8a/libchoice.so
+SHA-256-Digest: 6mBytBOzpQ8iAWBjLe2xBebcxmNTJIpT9xVVMdciZ6c=
+
+Name: assets/lira8/parameters.txt
+SHA-256-Digest: cs7bWjwoSEeKe+mpPPjMvTJp9c5peN+oXd17BVIbt88=
+
+Name: lib/armeabi-v7a/libpdnative.so
+SHA-256-Digest: fu7lEmh4bELiO49KgK+XUGv8sUuo2nPTGXAlXzayOrs=
+
+Name: lib/x86/libpdnativeopensl.so
+SHA-256-Digest: z9LT8KCdQB3n205iZlN0ZKDtbzqzWRu89iQa5mBOSus=
+
+Name: lib/x86_64/libpdnativeoboe.so
+SHA-256-Digest: wjSAkIVLd96OsyGh4X9MLoCTgcG+Rta0pIS0SQETsP4=
+
+Name: lib/x86_64/libbob_tilde.so
+SHA-256-Digest: YwNM69vtfodpjtxZaUH6pv/tg9q/rM3BTc5l0qfa328=
+
+Name: lib/armeabi-v7a/libbob_tilde.so
+SHA-256-Digest: Vn+cB7EUa07bjMZCPScMaecGzBeEutFqRhaC1b4Go2c=
+
+Name: lib/armeabi-v7a/libpdnativeopensl.so
+SHA-256-Digest: 9zZDqxKr2VewDfW37MTVp3lCy83LFpdkcVyN9mzq6YU=
+
+Name: assets/lira8/_LIRA-8.pd
+SHA-256-Digest: 44dmxTg+rksksU3FO1cGuV8KJmVywhhcPDjhsVV8ogI=
+
+Name: lib/x86/libchoice.so
+SHA-256-Digest: luu/aHdDQ/Y3qfv1BBzRtK6wvqBQeRpO3y+SXog/64A=
+
+Name: assets/lira8/abs/gui.link/parameters.txt
+SHA-256-Digest: rpbOcoZ44ZBxYhuymB8bOnORdqwZ2aRJF5iFOYnQYnQ=
+
+Name: lib/armeabi-v7a/liboboe.so
+SHA-256-Digest: buvP+JI/EfedEL00BK/Mq5yNm6YpcJM0/HZmOJSw6RQ=
+
+Name: assets/lira8/abs/lira.voice.pd
+SHA-256-Digest: Yg/uvApL5svf7VkdxK+Lp4/Tr0grS3fwakSEerogl+w=
+
+Name: lib/x86_64/libloop_tilde.so
+SHA-256-Digest: 7JRrItj0HbsBrcIGPTMMlvFbMEvw8wc1+aar+HFZ1PA=
+
+Name: lib/x86/libloop_tilde.so
+SHA-256-Digest: 4D17dprHZkXy5VDFF97ICcg2AehWo/XSZ8Gvx2BblNM=
+
+Name: lib/x86/libsigmund_tilde.so
+SHA-256-Digest: zGbMRxMcLqQrbKf1OQjETArZbvQetkH5W59FZYoHCRQ=
+
+Name: classes.dex
+SHA-256-Digest: JF0y7W6TE6U7PH/zDN1S/i4OA37JVxdX0S3aN4SgzWk=
+
+Name: lib/x86/libpdnativeoboe.so
+SHA-256-Digest: IIHCpzmF8oKTcqFS/VXUbySNG6qzPYWYnS8YoY7wDlQ=
+
