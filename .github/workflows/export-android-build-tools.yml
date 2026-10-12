@@ -1,0 +1,31 @@
+name: Export Android build tools
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/export-android-build-tools.yml'
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Package apksigner and zipalign
+        shell: bash
+        run: |
+          set -euo pipefail
+          BT="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          mkdir -p out/lib64 out/lib
+          cp "$BT/apksigner" out/
+          cp "$BT/zipalign" out/
+          cp "$BT/lib/apksigner.jar" out/lib/
+          [ -d "$BT/lib64" ] && cp -a "$BT/lib64/." out/lib64/ || true
+          chmod +x out/apksigner out/zipalign
+          echo "$BT" > out/BUILD_TOOLS_SOURCE.txt
+      - name: Upload tools
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-tools-min
+          path: out
+          retention-days: 1
