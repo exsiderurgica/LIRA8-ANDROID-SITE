@@ -1,0 +1,16 @@
+name: Export exact pd-core snapshot
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/export-pdcore-snapshot.yml']
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download exact snapshot
+        run: curl -L --fail -o /tmp/pd-core-exact.aar https://central.sonatype.com/repository/maven-snapshots/io/github/libpd/android/pd-core/1.4.2-SNAPSHOT/pd-core-1.4.2-20260923.082121-1.aar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pd-core-exact
+          path: /tmp/pd-core-exact.aar
+          retention-days: 1
