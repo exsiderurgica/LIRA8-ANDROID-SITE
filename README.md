@@ -1,10 +1,14 @@
-# LIRA•8 Android — GOLD v0.20 SCREENREC
+# LIRA•8 Android — GOLD v0.27
 
 Public website for the Android port developed by Giorgio Cerrato and Filippo Belperio.
 
-Current stable build: `LIRA8-ANDROID-ONE-SHOT-v0.20-SCREENREC-GOLD.apk`
+Current stable build: `downloads/LIRA8-ANDROID-v0.27-GOLD.apk`
 
-SHA-256: `2fc289353fc86d1f27d9172e4be207763974dbc920659cd1d8516f876f10a4ae`
+SHA-256: `ff4785d811fc94aabfd24a5ec1d7a5cc4e0b7f193d7c568313f33d3a98d98f79`
+
+Version: `0.27-responsive-switch-gold` (versionCode 30).
+
+GOLD scope: EXSJAM2 audio-only Wi-Fi transport, responsive safe-area layout for phones/tablets, and cleaned-up SWITCH routing labels.
 
 Website: https://exsiderurgica.github.io/LIRA8-ANDROID-SITE/
 
