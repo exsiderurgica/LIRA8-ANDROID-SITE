@@ -1,0 +1,66 @@
+name: Clean LIRA8 newsletter copy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/clean-lira8-newsletter-copy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean-copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Remove TTG wording from visible newsletter area
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          s = s.replace(
+              'Subscribe for major LIRA•8 Android releases, important fixes and project updates. No spam.',
+              'Receive LIRA•8 Android news and updates. Unsubscribe at any time.'
+          )
+          s = s.replace(
+              'Iscriviti per ricevere nuove release di LIRA•8 Android, fix importanti e aggiornamenti sul progetto. Niente spam.',
+              'Ricevi novità e aggiornamenti di LIRA•8 per Android. Puoi disiscriverti in qualsiasi momento.'
+          )
+
+          old = '''.signup{width:540px;max-width:100%}.signup-frame{height:460px;overflow:hidden}.signup iframe{position:static;width:100%;height:100%;transform:none;overflow:hidden}
+          @media(max-width:540px){.signup-frame{height:580px}}
+          @media(max-width:380px){.signup-frame{height:660px}}'''
+          new = '''.signup{width:540px;max-width:100%}
+          /* The Brevo form contains its own duplicated intro copy. Keep the functional
+             email field/button but crop that redundant header so the LIRA•8 page copy
+             remains the only visible description. */
+          .signup-frame{height:330px;overflow:hidden;position:relative;background:#fff}
+          .signup iframe{position:absolute;left:0;top:-235px;width:100%;height:700px;transform:none;overflow:hidden}
+          @media(max-width:540px){.signup-frame{height:350px}.signup iframe{top:-330px;height:820px}}
+          @media(max-width:380px){.signup-frame{height:370px}.signup iframe{top:-350px;height:860px}}'''
+          if old not in s:
+              raise SystemExit('expected newsletter CSS block not found')
+          s = s.replace(old, new, 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit site update and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/clean-lira8-newsletter-copy.yml
+          git config user.name 'exsiderurgica'
+          git config user.email 'exsiderurgica@gmail.com'
+          git add index.html .github/workflows/clean-lira8-newsletter-copy.yml
+          git commit -m 'Simplify LIRA8 newsletter copy'
+          git push origin main
