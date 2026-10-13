@@ -1,0 +1,55 @@
+name: Fix LIRA8 Brevo TTG wording
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-lira8-brevo-ttg.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Keep full Brevo form but mask TTG sentence
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          old = '''/* Restore the original full Brevo signup form. */
+          .signup{width:540px;max-width:100%}.signup-frame{height:460px;overflow:hidden}.signup iframe{position:static;width:100%;height:100%;transform:none;overflow:hidden}
+          @media(max-width:540px){.signup-frame{height:580px}}
+          @media(max-width:380px){.signup-frame{height:660px}}'''
+
+          new = '''/* Full Brevo signup form, with only the old TTG sentence visually replaced. */
+          .signup{width:540px;max-width:100%}.signup-frame{height:460px;overflow:hidden;position:relative}.signup iframe{position:static;width:100%;height:100%;transform:none;overflow:hidden}
+          .signup-frame::after{content:"Ricevi novità e aggiornamenti di LIRA•8 per Android. Puoi disiscriverti in qualsiasi momento.";position:absolute;z-index:3;left:30px;right:30px;top:138px;height:112px;background:#fff;color:#3f4857;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:400;line-height:1.55;padding:4px 0;pointer-events:none}
+          @media(max-width:540px){.signup-frame{height:580px}.signup-frame::after{left:28px;right:28px;top:140px;height:116px;font-size:16px}}
+          @media(max-width:380px){.signup-frame{height:660px}.signup-frame::after{left:24px;right:24px;top:138px;height:122px;font-size:15px}}'''
+
+          if old not in s:
+              raise SystemExit('expected full Brevo CSS block not found')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit fix and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/fix-lira8-brevo-ttg.yml
+          git config user.name 'exsiderurgica'
+          git config user.email 'exsiderurgica@gmail.com'
+          git add index.html .github/workflows/fix-lira8-brevo-ttg.yml
+          git commit -m 'Keep full LIRA8 signup form without TTG wording'
+          git push origin main
