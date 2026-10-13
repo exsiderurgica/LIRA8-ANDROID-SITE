@@ -1,0 +1,44 @@
+name: Fix LIRA8 Brevo overlay
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-lira8-brevo-overlay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-overlay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Stop replacement copy before the email label
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('top:138px;height:112px;', 'top:138px;height:72px;', 1)
+          s = s.replace('top:140px;height:116px;font-size:16px', 'top:140px;height:82px;font-size:16px', 1)
+          s = s.replace('top:138px;height:122px;font-size:15px', 'top:138px;height:94px;font-size:15px', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit fix and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/fix-lira8-brevo-overlay.yml
+          git config user.name 'exsiderurgica'
+          git config user.email 'exsiderurgica@gmail.com'
+          git add index.html .github/workflows/fix-lira8-brevo-overlay.yml
+          git commit -m 'Fix LIRA8 Brevo label overlap'
+          git push origin main
