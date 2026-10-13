@@ -1,0 +1,97 @@
+name: Promote LIRA8 v0.28 GOLD public
+
+on:
+  push:
+    branches:
+      - release/v0.28-gold
+    paths:
+      - '.github/workflows/promote-v028-gold.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/v0.28-gold
+
+      - name: Download verified GOLD artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://sdmntprwestus.oaiusercontent.com/files/00000000-ac5c-8230-a32d-3d8266968626/raw?se=2026-10-13T16%3A26%3A55Z&sp=r&sv=2026-02-06&sr=b&scid=f3b43744-4e26-53b6-ba20-a7d716ae31f2&skoid=3804227d-1b52-417d-afd9-9ffbb50fa53e&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-13T08%3A46%3A20Z&ske=2026-10-14T08%3A46%3A20Z&sks=b&skv=2026-02-06&sig=dpBPaBzHDdF0QvOCBfHpOHtrQs9RhBlQ2JLTe81Zvaw%3D'
+          curl -L --fail --retry 3 -o v028.zip "$URL"
+          unzip -q v028.zip -d v028
+          test -s v028/LIRA8-ANDROID-v0.28-GOLD.apk
+          echo 'ce0a4b3c318fb53e5a745555fda0cb197feab5b6d4bad143440463976df3e1d6  v028/LIRA8-ANDROID-v0.28-GOLD.apk' | sha256sum -c -
+          mkdir -p downloads
+          cp v028/LIRA8-ANDROID-v0.28-GOLD.apk downloads/LIRA8-ANDROID-v0.28-GOLD.apk
+
+      - name: Update public site metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHA='ce0a4b3c318fb53e5a745555fda0cb197feab5b6d4bad143440463976df3e1d6'
+          OLD_SHA='ff4785d811fc94aabfd24a5ec1d7a5cc4e0b7f193d7c568313f33d3a98d98f79'
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          replacements={
+            'GOLD v0.27':'GOLD v0.28',
+            'LIRA8-ANDROID-v0.27-GOLD.apk':'LIRA8-ANDROID-v0.28-GOLD.apk',
+            'ff4785d811fc94aabfd24a5ec1d7a5cc4e0b7f193d7c568313f33d3a98d98f79':'ce0a4b3c318fb53e5a745555fda0cb197feab5b6d4bad143440463976df3e1d6',
+            '0.27 / responsive safe-area + SWITCH labels GOLD':'0.28 / adaptive toolbar + robust EXSJAM2 discovery GOLD',
+            'v0.27 is the current GOLD baseline for public distribution, with EXSJAM2 audio-only Wi-Fi transport, responsive safe-area layout for phones and tablets, and cleaned-up SWITCH routing labels.':'v0.28 is the current GOLD baseline for public distribution, with adaptive toolbar spacing for narrow phones and more robust EXSJAM2 Wi-Fi/hotspot discovery while preserving the tested Oboe audio transport.',
+            'v0.27 è la baseline GOLD attuale per la distribuzione pubblica, con trasporto audio-only Wi-Fi EXSJAM2, layout responsive con aree sicure per telefoni e tablet e label SWITCH ripulite.':'v0.28 è la baseline GOLD attuale per la distribuzione pubblica, con toolbar adattiva per gli schermi più stretti e discovery EXSJAM2 Wi-Fi/hotspot più robusta, mantenendo invariato il percorso audio Oboe testato.',
+            'GOLD v0.25 PUBLIC — Giorgio Cerrato + Filippo Belperio':'GOLD v0.28 PUBLIC — Giorgio Cerrato + Filippo Belperio'
+          }
+          for old,new in replacements.items():
+              if old not in s:
+                  print('WARN missing:',old)
+              s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+          PY
+          printf '%s  downloads/%s\n' "$SHA" 'LIRA8-ANDROID-v0.28-GOLD.apk' > SHA256.txt
+          cat > downloads/README.md <<'EOF'
+          # Downloads
+
+          Current public stable GOLD APK:
+
+          `downloads/LIRA8-ANDROID-v0.28-GOLD.apk`
+
+          SHA-256:
+          `ce0a4b3c318fb53e5a745555fda0cb197feab5b6d4bad143440463976df3e1d6`
+
+          Version: `0.28-responsive-toolbar-jam-discovery-gold` (versionCode 31).
+
+          GOLD scope: v0.27 GOLD baseline plus adaptive REC/RESET/COLOR toolbar sizing that reserves the VIDEO/EXS area on narrow Android displays, and robust EXSJAM2 discovery using limited broadcast, per-interface directed broadcast and hotspot host fallback. The tested Oboe/TCP audio path is preserved.
+
+          The website download button points directly to this file.
+          EOF
+
+      - name: Validate public package files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s downloads/LIRA8-ANDROID-v0.28-GOLD.apk
+          grep -Fq 'GOLD v0.28' index.html
+          grep -Fq "const APK_URL='downloads/LIRA8-ANDROID-v0.28-GOLD.apk';" index.html
+          grep -Fq 'ce0a4b3c318fb53e5a745555fda0cb197feab5b6d4bad143440463976df3e1d6' index.html
+          ! grep -Fq 'LIRA8-ANDROID-v0.27-GOLD.apk' index.html
+          sha256sum -c SHA256.txt
+
+      - name: Commit release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add downloads/LIRA8-ANDROID-v0.28-GOLD.apk downloads/README.md SHA256.txt index.html
+          git commit -m 'Publish LIRA8 v0.28 GOLD'
+          git push origin HEAD:release/v0.28-gold
