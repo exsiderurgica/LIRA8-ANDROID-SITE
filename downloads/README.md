@@ -1,11 +1,14 @@
 # Downloads
 
-Current verified public APK:
+Current public stable GOLD APK:
 
-`downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk`
+`downloads/LIRA8-ANDROID-v0.25-GOLD.apk`
 
 SHA-256:
-`813cd4325c99f845e294686b1fd93782af48ce87790b9966b52a576897f37d59`
+`9e18baa7e423ade5c0ad3a2dff98aea1ac6e785b859b58846af34b76666aeacc`
 
-Exact INSTALL FIX build verified by a real on-device installation test.
-APK Signature Scheme v2 verified; ZIP alignment verified.
+Version: `0.25-exs-jam-tcp-oboe-layout-lift`.
+
+GOLD scope: v0.20 cutout-safe baseline, EXSJAM2 audio-only Wi-Fi transport, Android 9+ Oboe output capture, and 28 dp panel lift while preserving the 58 dp top cutout reserve.
+
+The website download button points directly to this file.
