@@ -1,0 +1,83 @@
+name: Publish LIRA8 v0.20 cutout-safe GOLD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-cutout-safe-gold.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruct exact on-device-tested cutout-safe GOLD APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, gzip, hashlib, json
+
+          apk = Path('downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk')
+          patch_b64 = Path('.release-public-v020/cutout-header-plus10.patch.json.gz.b64')
+          base = apk.read_bytes()
+          payload = gzip.decompress(base64.b64decode(patch_b64.read_text().strip()))
+          patch = json.loads(payload)
+
+          def sha(data):
+              return hashlib.sha256(data).hexdigest()
+
+          if sha(base) != patch['base_sha256']:
+              raise SystemExit(f"unexpected current APK SHA-256: {sha(base)}")
+
+          out = bytearray()
+          for op in patch['ops']:
+              if op[0] == 'copy':
+                  start, length = op[1], op[2]
+                  out += base[start:start+length]
+              elif op[0] == 'lit':
+                  out += base64.b64decode(op[1])
+              else:
+                  raise SystemExit(f"unknown patch op: {op[0]}")
+
+          out = bytes(out)
+          if len(out) != patch['new_size']:
+              raise SystemExit(f"wrong reconstructed size: {len(out)}")
+          if sha(out) != patch['new_sha256']:
+              raise SystemExit(f"wrong reconstructed SHA-256: {sha(out)}")
+
+          apk.write_bytes(out)
+
+          index = Path('index.html')
+          s = index.read_text()
+          old = patch['base_sha256']
+          new = patch['new_sha256']
+          if old not in s and new not in s:
+              raise SystemExit('release checksum not found in index.html')
+          s = s.replace(old, new)
+          s = s.replace('<span>0.20-public</span>', '<span>0.20-public / cutout-safe GOLD</span>')
+          s = s.replace('v0.20 PUBLIC is the current GOLD baseline for public distribution.', 'v0.20 PUBLIC cutout-safe is the current GOLD baseline for public distribution.')
+          s = s.replace('v0.20 PUBLIC è la baseline GOLD attuale per la distribuzione pubblica.', 'v0.20 PUBLIC cutout-safe è la baseline GOLD attuale per la distribuzione pubblica.')
+          index.write_text(s)
+
+          Path('SHA256.txt').write_text(f"{new}  {apk}\n")
+          print('Published GOLD SHA-256:', new)
+          PY
+
+          unzip -t downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk >/dev/null
+          sha256sum downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk
+
+      - name: Commit public GOLD
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add downloads/LIRA8-ANDROID-v0.20-PUBLIC-RELEASE.apk index.html SHA256.txt
+          git commit -m 'Publish LIRA8 v0.20 cutout-safe GOLD'
+          git push origin HEAD:main
