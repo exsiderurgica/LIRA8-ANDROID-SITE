@@ -2,13 +2,13 @@
 
 Current public stable GOLD APK:
 
-`downloads/LIRA8-ANDROID-v0.27-GOLD.apk`
+`downloads/LIRA8-ANDROID-v0.28-GOLD.apk`
 
 SHA-256:
-`ff4785d811fc94aabfd24a5ec1d7a5cc4e0b7f193d7c568313f33d3a98d98f79`
+`ce0a4b3c318fb53e5a745555fda0cb197feab5b6d4bad143440463976df3e1d6`
 
-Version: `0.27-responsive-switch-gold` (versionCode 30).
+Version: `0.28-responsive-toolbar-jam-discovery-gold` (versionCode 31).
 
-GOLD scope: v0.25 EXSJAM2/Oboe baseline plus the v0.26 responsive safe-area layout and the v0.27 SWITCH label cleanup. The functional SWITCH geometry remains unchanged; routing labels are separated to avoid overlap on phones and tablets.
+GOLD scope: v0.27 GOLD baseline plus adaptive REC/RESET/COLOR toolbar sizing that reserves the VIDEO/EXS area on narrow Android displays, and robust EXSJAM2 discovery using limited broadcast, per-interface directed broadcast and hotspot host fallback. The tested Oboe/TCP audio path is preserved.
 
 The website download button points directly to this file.
