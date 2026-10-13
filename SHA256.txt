@@ -1,1 +1,1 @@
-9e18baa7e423ade5c0ad3a2dff98aea1ac6e785b859b58846af34b76666aeacc  downloads/LIRA8-ANDROID-v0.25-GOLD.apk
+ff4785d811fc94aabfd24a5ec1d7a5cc4e0b7f193d7c568313f33d3a98d98f79  downloads/LIRA8-ANDROID-v0.27-GOLD.apk
