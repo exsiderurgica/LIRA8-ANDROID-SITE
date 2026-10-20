@@ -1,10 +1,6 @@
 name: Fix LIRA8 public release card
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/fix-public-release-card.yml'
   workflow_dispatch:
 
 permissions:

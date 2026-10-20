@@ -1,10 +1,6 @@
 name: Publish installable LIRA8 v2 APK
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/publish-v2-fix.yml'
   workflow_dispatch:
 
 permissions:

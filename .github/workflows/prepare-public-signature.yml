@@ -1,10 +1,6 @@
 name: Prepare LIRA8 public signature payload
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/prepare-public-signature.yml'
   workflow_dispatch:
 
 permissions:

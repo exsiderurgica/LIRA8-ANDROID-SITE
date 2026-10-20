@@ -1,9 +1,5 @@
 name: Export current public LIRA8 APK
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/export-broken-public-apk.yml'
   workflow_dispatch:
 jobs:
   export:

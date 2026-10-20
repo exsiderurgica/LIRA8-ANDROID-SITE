@@ -1,9 +1,5 @@
 name: Export current site GOLD APK
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/export-site-gold.yml'
   workflow_dispatch:
 jobs:
   export:

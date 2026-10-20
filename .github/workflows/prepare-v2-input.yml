@@ -1,10 +1,6 @@
 name: Prepare LIRA8 v2 signing input
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/prepare-v2-input.yml'
   workflow_dispatch:
 
 permissions:

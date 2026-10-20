@@ -1,8 +1,6 @@
 name: Export repo GOLD APK
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/export-repo-gold.yml']
+  workflow_dispatch:
 jobs:
   export:
     runs-on: ubuntu-latest

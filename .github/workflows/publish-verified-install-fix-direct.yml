@@ -1,10 +1,7 @@
 name: Publish verified LIRA8 install fix direct
 
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/publish-verified-install-fix-direct.yml']
-
+  workflow_dispatch:
 permissions:
   contents: write
 

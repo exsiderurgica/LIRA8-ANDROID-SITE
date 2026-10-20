@@ -1,8 +1,6 @@
 name: Check pd-core snapshots
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/check-pdcore-snapshot.yml']
+  workflow_dispatch:
 jobs:
   check:
     runs-on: ubuntu-latest

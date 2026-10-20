@@ -1,10 +1,6 @@
 name: Split prepared LIRA8 SF payload
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/split-site-sf.yml'
   workflow_dispatch:
 
 permissions:

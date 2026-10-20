@@ -1,10 +1,6 @@
 name: Export Android build tools
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/export-android-build-tools.yml'
   workflow_dispatch:
 
 jobs:

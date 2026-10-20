@@ -1,11 +1,7 @@
 name: Verify LIRA8 published install fix
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/publish-install-fix.yml'
-
+  workflow_dispatch:
 permissions:
   contents: write
 

@@ -1,10 +1,6 @@
 name: Emergency rollback to installable LIRA8 GOLD
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/emergency-rollback-installable-gold.yml'
   workflow_dispatch:
 
 permissions:

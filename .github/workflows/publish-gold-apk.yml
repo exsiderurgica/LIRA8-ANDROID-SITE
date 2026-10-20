@@ -1,10 +1,6 @@
 name: Publish LIRA8 public APK
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/publish-gold-apk.yml'
   workflow_dispatch:
 
 permissions:

@@ -1,10 +1,6 @@
 name: Apply LIRA8 APK v2 signature hotfix
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/apply-v2-signature-hotfix.yml'
   workflow_dispatch:
 
 permissions:
